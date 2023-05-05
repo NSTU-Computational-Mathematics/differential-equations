@@ -33,5 +33,25 @@ def runge_kutta_merson_method(x0, y0, xn, h, eps):
     print("x =", x0, "y =", y1)
 
 
+def runge_kutta_4_method(x0, y0, xn, h, eps):
+    while x0 < xn:
+        k1 = f(x0, y0)
+        k2 = f(x0 + h/2, y0 + h*k1/2)
+        k3 = f(x0 + h/2, y0 + h*k2/2)
+        k4 = f(x0 + h, y0 + h*k3)
+        y1 = y0 + h/6 * (k1 + 2*k2 + 2*k3 + k4)
+        err = abs(y1 - y0) / (1 + abs(y1))
+        if err < eps:
+            x0 += h
+            y0 = y1
+            if abs(x0 - xn) < 1e-14:
+                break
+            h *= min(5, max(0.1, 0.9 * (eps / err) ** 0.2))
+        else:
+            h *= max(0.1, 0.9 * (eps / err) ** 0.25)
+    print("x =", x0, "y =", y1)
+
+
 euler_method(0, 1, 3, 0.000001)
 runge_kutta_merson_method(0, 1, 3, 0.01, 0.01)
+runge_kutta_4_method(0, 1, 3, 0.01, 0.01)
