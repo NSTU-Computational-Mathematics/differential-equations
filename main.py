@@ -1,3 +1,7 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 def f(x, y):
     return y - x ** 2
 
@@ -11,6 +15,7 @@ def euler_method(x0, y0, xn, h):
         xn1 = xn + h
         xn, yn = xn1, yn1
     print("x =", xn, "y =", yn)
+    return xn, yn
 
 
 def runge_kutta_merson_method(x0, y0, xn, h, eps):
@@ -31,6 +36,7 @@ def runge_kutta_merson_method(x0, y0, xn, h, eps):
         else:
             h *= max(0.1, 0.9 * (eps / err) ** 0.25)
     print("x =", x0, "y =", y1)
+    return x0, y1
 
 
 def runge_kutta_4_method(x0, y0, xn, h, eps):
@@ -50,8 +56,38 @@ def runge_kutta_4_method(x0, y0, xn, h, eps):
         else:
             h *= max(0.1, 0.9 * (eps / err) ** 0.25)
     print("x =", x0, "y =", y1)
+    return x0, y1
 
 
-euler_method(0, 1, 3, 0.000001)
-runge_kutta_merson_method(0, 1, 3, 0.01, 0.01)
-runge_kutta_4_method(0, 1, 3, 0.01, 0.01)
+def plotting(dot_x, dot_y, title_name):
+    x0, y0 = 0, 1
+    xn = 3
+    h = 0.01
+
+    x_arr = np.arange(x0, xn + h, h)
+    y_arr = np.zeros_like(x_arr)
+    y_arr[0] = y0
+
+    for i in range(len(x_arr) - 1):
+        k1 = f(x_arr[i], y_arr[i])
+        k2 = f(x_arr[i] + h / 2, y_arr[i] + h * k1 / 2)
+        k3 = f(x_arr[i] + h / 2, y_arr[i] + h * k2 / 2)
+        k4 = f(x_arr[i] + h, y_arr[i] + h * k3)
+        y_arr[i + 1] = y_arr[i] + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+
+    plt.plot(x_arr, y_arr)
+    plt.plot(dot_x, dot_y, 'o')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title(title_name)
+    plt.grid(True)
+    plt.show()
+
+
+x1, y1 = euler_method(0, 1, 3, 0.000001)
+x2, y2 = runge_kutta_merson_method(0, 1, 3, 0.01, 0.01)
+x3, y3 = runge_kutta_4_method(0, 1, 3, 0.01, 0.01)
+
+plotting(x1, y1, "Решение дифференциального уравнения y' = y - x^2, метод Эйлера")
+plotting(x2, y2, "Решение дифференциального уравнения y' = y - x^2, метод Рунге–Кутты–Мерсона")
+plotting(x3, y3, "Решение дифференциального уравнения y' = y - x^2, метод Рунге–Кутты 4-го порядка")
