@@ -85,8 +85,8 @@ def plotting(dot_x, dot_y, title_name):
 
 
 x1, y1 = euler_method(0, 1, 3, 0.000001)
-x2, y2 = runge_kutta_merson_method(0, 1, 3, 0.01, 0.01)
-x3, y3 = runge_kutta_4_method(0, 1, 3, 0.01, 0.01)
+x2, y2 = runge_kutta_merson_method(0, 1, 3, 0.0001, 0.001)
+x3, y3 = runge_kutta_4_method(0, 1, 3, 0.0001, 0.001)
 
 plotting(x1, y1, "Решение дифференциального уравнения y' = y - x^2, метод Эйлера")
 plotting(x2, y2, "Решение дифференциального уравнения y' = y - x^2, метод Рунге–Кутты–Мерсона")
