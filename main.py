@@ -1,24 +1,33 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from adams_method import AdamsMethod 
 
 def f(x, y):
     return y - x ** 2
 
-
 def euler_method(x0, y0, xn, h):
+    dots_x = []
+    dots_y = []
+    
     n = int((xn - x0) / h)
     xn = x0
     yn = y0
     for i in range(n):
         yn1 = yn + h * f(xn, yn)
         xn1 = xn + h
+
+        dots_x.append(xn1)
+        dots_y.append(yn1)
+
         xn, yn = xn1, yn1
-    print("x =", xn, "y =", yn)
-    return xn, yn
+
+    return dots_x, dots_y
 
 
 def runge_kutta_merson_method(x0, y0, xn, h, eps):
+    dots_x = []
+    dots_y = []
+
     while x0 < xn:
         k1 = f(x0, y0)
         k2 = f(x0 + h / 3, y0 + h * k1 / 3)
@@ -35,11 +44,17 @@ def runge_kutta_merson_method(x0, y0, xn, h, eps):
             h *= min(5, max(0.1, 0.9 * (eps / err) ** 0.2))
         else:
             h *= max(0.1, 0.9 * (eps / err) ** 0.25)
-    print("x =", x0, "y =", y1)
-    return x0, y1
+            
+        dots_x.append(x0)
+        dots_y.append(y1)
+
+    return dots_x, dots_y
 
 
 def runge_kutta_4_method(x0, y0, xn, h, eps):
+    dots_x = []
+    dots_y = []
+
     while x0 < xn:
         k1 = f(x0, y0)
         k2 = f(x0 + h/2, y0 + h*k1/2)
@@ -55,28 +70,24 @@ def runge_kutta_4_method(x0, y0, xn, h, eps):
             h *= min(5, max(0.1, 0.9 * (eps / err) ** 0.2))
         else:
             h *= max(0.1, 0.9 * (eps / err) ** 0.25)
-    print("x =", x0, "y =", y1)
-    return x0, y1
 
+        dots_x.append(x0)
+        dots_y.append(y1)
 
-def plotting(dot_x, dot_y, title_name):
-    x0, y0 = 0, 1
-    xn = 3
-    h = 0.01
+    return dots_x, dots_y
 
-    x_arr = np.arange(x0, xn + h, h)
-    y_arr = np.zeros_like(x_arr)
-    y_arr[0] = y0
+def adams_method():
+    dots_x_3, dots_y_3 = runge_kutta_4_method(0, 1, 4, 0.001, 0.001)
+    factors = [-9.0,  37.0, -59.0, 55.0]
+    first_points = []
+    for i in range(4):
+        first_points.append((dots_x_3[i], dots_y_3[i]))
+    adams_method = AdamsMethod(first_points, 4, factors, 0.001, f)
+    dots_x_4, dots_y_4 = adams_method.calc_points()
+    return dots_x_4, dots_y_4
 
-    for i in range(len(x_arr) - 1):
-        k1 = f(x_arr[i], y_arr[i])
-        k2 = f(x_arr[i] + h / 2, y_arr[i] + h * k1 / 2)
-        k3 = f(x_arr[i] + h / 2, y_arr[i] + h * k2 / 2)
-        k4 = f(x_arr[i] + h, y_arr[i] + h * k3)
-        y_arr[i + 1] = y_arr[i] + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
-
-    plt.plot(x_arr, y_arr)
-    plt.plot(dot_x, dot_y, 'o')
+def plotting(dots_x, dots_y, title_name):
+    plt.plot(dots_x, dots_y)
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title(title_name)
@@ -84,10 +95,5 @@ def plotting(dot_x, dot_y, title_name):
     plt.show()
 
 
-x1, y1 = euler_method(0, 1, 3, 0.000001)
-x2, y2 = runge_kutta_merson_method(0, 1, 3, 0.0001, 0.001)
-x3, y3 = runge_kutta_4_method(0, 1, 3, 0.0001, 0.001)
-
-plotting(x1, y1, "Решение дифференциального уравнения y' = y - x^2, метод Эйлера")
-plotting(x2, y2, "Решение дифференциального уравнения y' = y - x^2, метод Рунге–Кутты–Мерсона")
-plotting(x3, y3, "Решение дифференциального уравнения y' = y - x^2, метод Рунге–Кутты 4-го порядка")
+dots_x, dots_y = adams_method()
+plotting(dots_x, dots_y, "")
